@@ -138,7 +138,7 @@ void loop() {
 	}
 
 	state = digitalRead(RusState1Pin);
-	if ((millis() - dontCheckStateRus) > 1000)
+	if ((millis() - dontCheckStateRus) > 700)
 	{
 		if ((state == HIGH && bRusL1On) || (state == LOW && !bRusL1On))
 		{
@@ -148,21 +148,22 @@ void loop() {
 			}
 			//Состояние изменилось, инвертируем состояние и выводим изменение на экран
 			//bL1On = !bL1On;
+			if (state == HIGH)
+			{
+				bRusL1On = false;
+			}
+			else
+			{
+				bRusL1On = true;
+			}
 			lastRusLivoloEvent = millis();
 		}
 	}
-	if (state == HIGH)
-	{
-		bRusL1On = false;
-	}
-	else
-	{
-		bRusL1On = true;
-	}
+	
 	//  printLivoloState(1);
 
 	state = digitalRead(RusState2Pin);
-	if ((millis() - dontCheckStateRus) > 1000)
+	if ((millis() - dontCheckStateRus) > 700)
 	{
 		if ((state == HIGH && bRusL2On) || (state == LOW && !bRusL2On))
 		{
@@ -171,17 +172,18 @@ void loop() {
 			{
 				Serial.println("Ruslan Livolo 2 manual Event!");
 			}
-			bRusL2On = !bRusL2On;
+			//bRusL2On = !bRusL2On;
+			if (state == HIGH)
+			{
+				bRusL2On = false;
+			}
+			else
+			{
+				bRusL2On = true;
+			}
 			lastRusLivoloEvent = millis();
 		}
 	}
-	if (state == HIGH)
-	{
-		bRusL2On = false;
-	}
-	else
-	{
-		bRusL2On = true;
-	}
+	
 }
 
