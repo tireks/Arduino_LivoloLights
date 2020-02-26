@@ -1,4 +1,4 @@
-int RusPIRPin = 5;
+п»їint RusPIRPin = 5;
 
 int RusSwitch1Pin = A3;
 int RusState1Pin = A2;
@@ -18,7 +18,7 @@ unsigned long RusLivoloTimeConst = 15 * 1000; //time, when system is ignoring PI
 unsigned long RusPIRTimeConst = 3 * 1000;//time, when system is ignoring PIR after PIR-controlled
 										 //turn on/off the light --MAYBE,NOT SURE
 
-bool Debug = true; //режим отладки
+bool Debug = true;
 
 void SwitchLivolo(int n)//process of applying voltage to a specific pin
 {
@@ -65,7 +65,7 @@ void LivoloOff(int n)//while turning on and turning off switcher, calling "Switc
 }
 
 
-void setup() 
+void setup()
 {
 	if (Debug)
 	{
@@ -79,8 +79,8 @@ void setup()
 	pinMode(RusState2Pin, INPUT_PULLUP);
 
 	lastRusPIRTime = millis();//means at what time pir was last activated
-	lastRusLivoloEvent = millis();
-	dontCheckStateRus = millis();
+	lastRusLivoloEvent = millis();//means at what time 1-st/2-nd/both lamp(s) was manually activated/disactivated
+	dontCheckStateRus = millis();//delay due to electronic "noise" of PIR
 }
 
 void loop() {
@@ -88,29 +88,29 @@ void loop() {
 	//////////////////////////////  Livolo start
 
 	int state = 0;
-	// lcd.setCursor(10, 0); 
-	//  lcd.print("      "); 
+
 
 	if ((millis() - lastRusLivoloEvent) > RusLivoloTimeConst)
 	{
 		state = digitalRead(RusPIRPin);
 
-		if (/*(hour()>17 || hour()<10) &&*/ (state == HIGH))//проверяем датчик движения только с 17:00 до 10:00(todo, but now disactivated)
+		if (/*(hour()>17 || hour()<10) &&*/ (state == HIGH))//ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ Г¤Г ГІГ·ГЁГЄ Г¤ГўГЁГ¦ГҐГ­ГЁГї ГІГ®Г«ГјГЄГ® Г± 17:00 Г¤Г® 10:00(todo, but now disactivated)
 		{
 			if (!bRusAlreadyOn)
 			{
 				LivoloOn(1);
 				LivoloOn(2);
+				Debug = true; //unlock "Debug" to write text in serial output
 				if (Debug)
 				{
 					Serial.println("Ruslan Livolo On by PIR!");
+
 				}
 				bRusAlreadyOn = true;
+				bRusPIROn = true;
 			}
 			lastRusPIRTime = millis();
-			bRusPIROn = true;
-			//      lcd.setCursor(10, 0); 
-			//      lcd.print("PIR ON"); 
+			//bRusPIROn = true;
 
 
 		}
@@ -123,67 +123,63 @@ void loop() {
 				if (Debug)
 				{
 					Serial.println("Ruslan Livolo Off by PIR!");
+					Debug = false; //locking "Debug" to prevent spamming "Ruslan Livolo Off by PIR!"
 				}
-				//bL1On = false;
-				//bL2On = false;
 				bRusAlreadyOn = false;
+				bRusPIROn = false;
 			}
-			bRusPIROn = false;
+			//bRusPIROn = false;
 		}
 	}
-	else
-	{
-		//      lcd.setCursor(10, 0); 
-		//      lcd.print("EVENT"); 
-	}
+
 
 	state = digitalRead(RusState1Pin);
-	if ((millis() - dontCheckStateRus) > 700)
+	if ((millis() - dontCheckStateRus) > 1000)
 	{
 		if ((state == HIGH && bRusL1On) || (state == LOW && !bRusL1On))
 		{
+			//state of dat light has changed
+			Debug = true;//unlock "Debug" to write text in serial output
 			if (Debug)
 			{
 				Serial.println("Ruslan Livolo 1 manual Event");
+
 			}
-			//Состояние изменилось, инвертируем состояние и выводим изменение на экран
 			//bL1On = !bL1On;
-			if (state == HIGH)
-			{
-				bRusL1On = false;
-			}
-			else
-			{
-				bRusL1On = true;
-			}
 			lastRusLivoloEvent = millis();
 		}
 	}
-	
-	//  printLivoloState(1);
+	if (state == HIGH)
+	{
+		bRusL1On = false;
+	}
+	else
+	{
+		bRusL1On = true;
+	}
 
 	state = digitalRead(RusState2Pin);
-	if ((millis() - dontCheckStateRus) > 700)
+	if ((millis() - dontCheckStateRus) > 1000)
 	{
 		if ((state == HIGH && bRusL2On) || (state == LOW && !bRusL2On))
 		{
-			//Состояние изменилось, инвертируем состояние и выводим изменение на экран
+			//state of dat light has changed
+			Debug = true;//unlock "Debug" to write text in serial output
 			if (Debug)
 			{
 				Serial.println("Ruslan Livolo 2 manual Event!");
+
 			}
 			//bRusL2On = !bRusL2On;
-			if (state == HIGH)
-			{
-				bRusL2On = false;
-			}
-			else
-			{
-				bRusL2On = true;
-			}
 			lastRusLivoloEvent = millis();
 		}
 	}
-	
+	if (state == HIGH)
+	{
+		bRusL2On = false;
+	}
+	else
+	{
+		bRusL2On = true;
+	}
 }
-
