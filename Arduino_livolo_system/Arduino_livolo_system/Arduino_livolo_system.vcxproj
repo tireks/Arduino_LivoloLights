@@ -116,6 +116,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\PIR_test.cpp" />
+    <ClCompile Include="..\..\rtc_time_test.cpp" />
     <ClCompile Include="..\..\wires_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
