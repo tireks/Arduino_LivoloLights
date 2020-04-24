@@ -3,10 +3,10 @@ int RusPIRPin = A0;
 
 //bool Debug = true; //temporary turned off
 
-int RusSwitch1Pin = A3;
-int RusState1Pin = A2;
-int RusSwitch2Pin = 9;
-int RusState2Pin = 8;
+int RusSwitch1Pin = 33;
+int RusState1Pin = A1;
+int RusSwitch2Pin = 29;
+int RusState2Pin = A3;
 bool bRusL1On = false;
 bool bRusL2On = false;
 bool bRusAlreadyOn = false;
